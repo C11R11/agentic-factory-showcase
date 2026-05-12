@@ -1,9 +1,0 @@
-@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap');
-
-body {
-    font-family: 'JetBrains+Mono', monospace;
-}
-
-.token-bar-p { background-color: #475569; }
-.token-bar-r { background-color: #3b82f6; }
-.token-bar-o { background-color: #10b981; }

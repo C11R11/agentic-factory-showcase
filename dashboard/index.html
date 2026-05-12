@@ -3,72 +3,50 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Factory | FinOps Transparency Dashboard</title>
+    <title>AI Factory | Hybrid Telemetry Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="css/style.css">
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap');
+        body { font-family: 'JetBrains+Mono', monospace; }
+        .token-bar-p { background-color: #475569; }
+        .token-bar-r { background-color: #3b82f6; }
+        .token-bar-o { background-color: #10b981; }
+        .axis-label { font-size: 10px; fill: #64748b; font-weight: bold; text-transform: uppercase; }
+        .area-p { fill: #475569; fill-opacity: 0.6; }
+        .area-r { fill: #3b82f6; fill-opacity: 0.6; }
+        .area-o { fill: #10b981; fill-opacity: 0.6; }
+    </style>
 </head>
 <body class="bg-slate-950 text-slate-200 min-h-screen font-mono pb-20">
     
     <nav class="border-b border-slate-800 p-4 bg-slate-950/90 backdrop-blur-md sticky top-0 z-50">
         <div class="max-w-7xl mx-auto flex justify-between items-center">
-            <h1 class="text-lg font-bold text-white uppercase italic tracking-tighter">AI Factory <span class="text-emerald-500">FinOps</span></h1>
-            <div id="status-tag" class="text-[9px] text-slate-500 uppercase tracking-widest font-bold">Telemetry: 100% Congruent</div>
+            <h1 class="text-lg font-bold text-white uppercase italic tracking-tighter">AI Factory <span class="text-emerald-500">Telemetry</span></h1>
+            <div id="status-tag" class="text-[9px] text-slate-500 uppercase tracking-widest font-bold">Status: Online</div>
         </div>
     </nav>
 
     <main class="max-w-7xl mx-auto p-6 space-y-8">
 
-        <div class="bg-amber-400 border-2 border-amber-500 p-8 rounded-lg shadow-[0_0_30px_rgba(251,191,36,0.1)] text-slate-950">
-            <div class="flex flex-col md:flex-row gap-8 items-start">
-                <div class="flex-1">
-                    <h2 class="text-2xl font-black uppercase tracking-tighter mb-4 italic">Economic Value vs. Subsidized Cost</h2>
-                    <div class="space-y-4 text-sm leading-relaxed font-bold">
-                        <p>
-                            This dashboard calculates the <span class="underline decoration-2">Industrial Economic Value</span> of agentic labor using a baseline of 
-                            <span class="bg-black text-white px-2 py-0.5 rounded">$5.00/1M Prompt</span> and 
-                            <span class="bg-black text-white px-2 py-0.5 rounded">$37.00/1M Reasoning/Output</span>.
-                        </p>
-                        <p>
-                            <span class="italic">"Why is my bill only $0.73?"</span> Your actual cost is currently subsidized by the 
-                            <span class="underline">Google AI Studio Free Tier</span>, which provides recurring capacity (up to 1,500 requests per day) for Gemini 1.5 Flash. 
-                        </p>
-                        <p>
-                            To maintain FinOps discipline, we track the **Market Value** ($25.00+) rather than the subsidized bill. This ensures that when your factory scales beyond free-tier limits, your unit economics remain predictable.
-                        </p>
-                    </div>
-                </div>
-                <div class="md:w-64 w-full flex flex-col gap-3">
-                    <a href="https://ai.google.dev/pricing" target="_blank" class="bg-slate-950 text-amber-400 p-4 rounded text-center font-black uppercase tracking-widest hover:bg-black transition-all text-xs border-b-4 border-slate-800">
-                        View Official Price Table ↗
-                    </a>
-                    <div class="bg-amber-500/30 p-3 rounded border border-amber-600/50 text-[10px] uppercase font-black">
-                        Metric: Flash-1.5 Optimized<br>
-                        Free Cap: 1M Tokens/Min<br>
-                        Drift Logic: 100% Verified
-                    </div>
-                </div>
-            </div>
-        </div>
-        
         <div class="bg-slate-900 border border-slate-800 p-8 rounded-lg shadow-2xl">
             <div class="flex flex-col md:flex-row justify-between mb-8 border-b border-slate-800 pb-8">
                 <div>
-                    <p class="text-slate-500 text-[10px] uppercase mb-1 tracking-widest font-bold">Factory Capital Invested (Industrial Value)</p>
-                    <h2 id="total-usd" class="text-6xl font-bold text-white tracking-tighter">$0.00</h2>
-                    <p class="text-[8px] text-slate-600 mt-2 font-bold uppercase tracking-widest italic">*Calculated at Industrial Rates ($5/$37) to remove Free-Tier bias.</p>
+                    <p class="text-slate-500 text-[10px] uppercase mb-1 tracking-widest font-bold text-emerald-500/50">Production Efficiency</p>
+                    <h2 id="efficiency-score" class="text-6xl font-bold text-emerald-500">0%</h2>
                 </div>
                 <div class="text-right">
-                    <p class="text-slate-500 text-[10px] uppercase mb-1 tracking-widest font-bold text-emerald-500/50">Production Efficiency</p>
-                    <h2 id="efficiency-score" class="text-5xl font-bold text-emerald-500">0%</h2>
+                    <p class="text-slate-500 text-[10px] uppercase mb-1 tracking-widest font-bold">Total Lifecycle Consumption</p>
+                    <span id="lifecycle-total" class="text-5xl font-bold text-white">0 <span class="text-xs text-slate-600">TOKENS</span></span>
                 </div>
             </div>
+            
             <div class="space-y-4">
-                <div class="flex justify-between items-end">
-                    <span id="lifecycle-total" class="text-3xl font-bold text-white">0 <span class="text-xs text-slate-600">TOKENS</span></span>
+                <div class="flex justify-end">
                     <div class="flex space-x-6 text-[10px] font-mono">
-                        <div class="flex flex-col items-end"><span class="text-slate-500 uppercase text-[8px]">Prompt</span><span id="life-p">0</span></div>
-                        <div class="flex flex-col items-end"><span class="text-blue-500 uppercase text-[8px]">Thinking</span><span id="life-r">0</span></div>
-                        <div class="flex flex-col items-end"><span class="text-emerald-500 uppercase text-[8px]">Output</span><span id="life-o">0</span></div>
+                        <div class="flex flex-col items-end"><span class="text-slate-500 uppercase text-[8px] font-bold">Prompt</span><span id="life-p">0</span></div>
+                        <div class="flex flex-col items-end"><span class="text-blue-500 uppercase text-[8px] font-bold">Thinking</span><span id="life-r">0</span></div>
+                        <div class="flex flex-col items-end"><span class="text-emerald-500 uppercase text-[8px] font-bold">Output</span><span id="life-o">0</span></div>
                     </div>
                 </div>
                 <div class="w-full bg-slate-950 h-3 rounded-full overflow-hidden flex border border-slate-800">
@@ -81,15 +59,225 @@
 
         <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-6" id="phase-details-container"></div>
 
+        <div class="bg-slate-900 border border-slate-800 p-6 rounded-lg shadow-xl">
+            <h3 class="text-[10px] text-slate-500 uppercase font-bold tracking-widest mb-6 italic">Temporal Consumption (Source: telemetry.json)</h3>
+            <div id="temporal-chart" class="w-full h-80"></div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div class="bg-slate-900 border border-slate-800 p-6 rounded-lg shadow-xl">
+                <h3 class="text-[10px] text-slate-500 uppercase font-bold tracking-widest mb-6 italic">Phase Composition Analysis</h3>
+                <div id="phase-chart" class="w-full h-64"></div>
+            </div>
+            <div class="bg-slate-900 border border-slate-800 p-6 rounded-lg shadow-xl">
+                <h3 class="text-[10px] text-slate-500 uppercase font-bold tracking-widest mb-6 italic">Top Slice Consumption</h3>
+                <div id="slice-chart" class="w-full h-64"></div>
+            </div>
+        </div>
+
         <div class="bg-slate-900 border border-slate-800 rounded-lg overflow-hidden shadow-2xl">
             <div class="bg-slate-950 p-4 border-b border-slate-800 flex justify-between">
                 <span class="text-[10px] text-slate-500 uppercase font-bold tracking-widest italic">Industrial Registry</span>
                 <span id="congruence-check" class="text-[9px] text-emerald-500 font-bold uppercase">Congruence Verified</span>
             </div>
-            <table class="w-full text-left"><tbody id="registry-table-body" class="divide-y divide-slate-800"></tbody></table>
+            <table class="w-full text-left">
+                <tbody id="registry-table-body" class="divide-y divide-slate-800"></tbody>
+            </table>
         </div>
     </main>
 
-<script type="module" src="js/app.js"></script>
+    <script type="module">
+        const format = (n) => n ? n.toLocaleString() : '0';
+        const SSD_ORDER = ['foundations', 'specs', 'planning', 'implementation', 'validation'];
+        const PHASE_CONFIG = {
+            foundations: { color: 'border-slate-600', icon: '🏗️', label: 'Foundations' },
+            specs: { color: 'border-blue-600', icon: '📋', label: 'Master Specs' },
+            planning: { color: 'border-indigo-500', icon: '🎯', label: 'Planning' },
+            implementation: { color: 'border-emerald-500', icon: '⚙️', label: 'Implementation' },
+            validation: { color: 'border-amber-400', icon: '🧪', label: 'Validation' }
+        };
+
+        function drawTemporalChart(logs) {
+            const container = d3.select("#temporal-chart");
+            container.selectAll("*").remove();
+            if (!logs || logs.length === 0) return;
+
+            const width = container.node().clientWidth;
+            const height = 320;
+            const margin = { top: 20, right: 30, bottom: 50, left: 60 };
+
+            const data = logs.map(d => ({
+                date: new Date(d.timestamp),
+                Prompt: d.tokens.prompt,
+                Thinking: d.tokens.reasoning,
+                Output: d.tokens.output
+            })).sort((a,b) => a.date - b.date);
+
+            const svg = container.append("svg").attr("width", width).attr("height", height);
+            const x = d3.scaleTime().domain(d3.extent(data, d => d.date)).range([margin.left, width - margin.right]);
+            const y = d3.scaleLinear().domain([0, d3.max(data, d => d.Prompt + d.Thinking + d.Output)]).nice().range([height - margin.bottom, margin.top]);
+            const color = d3.scaleOrdinal().domain(["Prompt", "Thinking", "Output"]).range(["#475569", "#3b82f6", "#10b981"]);
+            const stack = d3.stack().keys(["Prompt", "Thinking", "Output"]);
+            const series = stack(data);
+            const area = d3.area().x(d => x(d.data.date)).y0(d => y(d[0])).y1(d => y(d[1])).curve(d3.curveMonotoneX);
+
+            svg.append("g").selectAll("path").data(series).join("path")
+                .attr("fill", ({key}) => color(key)).attr("opacity", 0.7).attr("d", area);
+
+            svg.append("g").attr("transform", `translate(0,${height - margin.bottom})`).call(d3.axisBottom(x).ticks(width / 80)).attr("class", "axis-label");
+            svg.append("g").attr("transform", `translate(${margin.left},0)`).call(d3.axisLeft(y).tickFormat(d3.format(".0s"))).attr("class", "axis-label");
+        }
+
+        function drawStaticCharts(meta, slices) {
+            const phaseData = SSD_ORDER.map(id => ({
+                phase: PHASE_CONFIG[id].label,
+                Prompt: meta.global_finops.phase_stats[id]?.prompt || 0,
+                Thinking: meta.global_finops.phase_stats[id]?.reasoning || 0,
+                Output: meta.global_finops.phase_stats[id]?.output || 0
+            }));
+
+            // Phase Composition
+            const pcContainer = d3.select("#phase-chart");
+            pcContainer.selectAll("*").remove();
+            const width = pcContainer.node().clientWidth;
+            const height = 250;
+            const margin = { top: 10, right: 30, bottom: 40, left: 100 };
+            const svg = pcContainer.append("svg").attr("width", width).attr("height", height);
+            const x = d3.scaleLinear().domain([0, d3.max(phaseData, d => d.Prompt + d.Thinking + d.Output)]).range([margin.left, width - margin.right]);
+            const y = d3.scaleBand().domain(phaseData.map(d => d.phase)).range([margin.top, height - margin.bottom]).padding(0.3);
+            const stack = d3.stack().keys(["Prompt", "Thinking", "Output"])(phaseData);
+            const colors = ["#475569", "#3b82f6", "#10b981"];
+
+            svg.append("g").selectAll("g").data(stack).join("g").attr("fill", (d, i) => colors[i])
+                .selectAll("rect").data(d => d).join("rect")
+                .attr("y", d => y(d.data.phase)).attr("x", d => x(d[0]))
+                .attr("width", d => x(d[1]) - x(d[0])).attr("height", y.bandwidth());
+
+            svg.append("g").attr("transform", `translate(0,${height - margin.bottom})`).call(d3.axisBottom(x).ticks(5).tickFormat(d3.format(".0s"))).attr("class", "axis-label");
+            svg.append("g").attr("transform", `translate(${margin.left},0)`).call(d3.axisLeft(y).tickSize(0)).attr("class", "axis-label");
+
+            // Top Slices
+            const scContainer = d3.select("#slice-chart");
+            scContainer.selectAll("*").remove();
+            const topSlices = [...slices].sort((a,b) => (b.token_usage?.total || 0) - (a.token_usage?.total || 0)).slice(0, 5);
+            const svg2 = scContainer.append("svg").attr("width", width).attr("height", height);
+            const x2 = d3.scaleLinear().domain([0, d3.max(topSlices, d => d.token_usage?.total || 0)]).range([margin.left, width - margin.right]);
+            const y2 = d3.scaleBand().domain(topSlices.map(d => d.id)).range([margin.top, height - margin.bottom]).padding(0.4);
+
+            svg2.append("g").selectAll("rect").data(topSlices).join("rect")
+                .attr("x", x2(0)).attr("y", d => y2(d.id)).attr("width", d => x2(d.token_usage?.total || 0) - x2(0))
+                .attr("height", y2.bandwidth()).attr("fill", "#6366f1").attr("rx", 2);
+
+            svg2.append("g").attr("transform", `translate(0,${height - margin.bottom})`).call(d3.axisBottom(x2).ticks(3).tickFormat(d3.format(".0s"))).attr("class", "axis-label");
+            svg2.append("g").attr("transform", `translate(${margin.left},0)`).call(d3.axisLeft(y2).tickSize(0)).attr("class", "axis-label");
+        }
+
+        function renderPhaseFlow(phases) {
+            const container = document.getElementById('phase-details-container');
+            if (!container) return;
+            container.innerHTML = SSD_ORDER.map(phaseId => {
+                const stat = phases[phaseId] || { prompt: 0, reasoning: 0, output: 0, total: 0 };
+                const cfg = PHASE_CONFIG[phaseId];
+                return `
+                    <div class="bg-slate-900 border border-slate-800 p-6 rounded-lg border-l-4 ${cfg.color} flex flex-col justify-between">
+                        <div>
+                            <div class="flex justify-between items-center mb-4"><span class="text-[10px] text-slate-400 font-bold uppercase tracking-tighter">${cfg.label}</span><span>${cfg.icon}</span></div>
+                            <div class="space-y-2 bg-slate-950/50 p-3 rounded border border-slate-800/50 mb-4">
+                                <div class="flex justify-between items-center text-[9px] font-mono"><span class="text-slate-600 font-bold uppercase">Prompt</span><span class="text-white">${format(stat.prompt)}</span></div>
+                                <div class="flex justify-between items-center text-[9px] font-mono"><span class="text-blue-600 font-bold uppercase">Thinking</span><span class="text-blue-400">${format(stat.reasoning)}</span></div>
+                                <div class="flex justify-between items-center text-[9px] font-mono"><span class="text-emerald-600 font-bold uppercase">Output</span><span class="text-emerald-400">${format(stat.output)}</span></div>
+                            </div>
+                        </div>
+                        <div class="w-full bg-slate-950 h-1 rounded-full overflow-hidden flex border border-slate-800">
+                            <div style="width: ${stat.total > 0 ? (stat.prompt / stat.total * 100) : 0}%" class="bg-slate-600 h-full"></div>
+                            <div style="width: ${stat.total > 0 ? (stat.reasoning / stat.total * 100) : 0}%" class="bg-blue-600 h-full"></div>
+                            <div style="width: ${stat.total > 0 ? (stat.output / stat.total * 100) : 0}%" class="bg-emerald-500 h-full"></div>
+                        </div>
+                    </div>`;
+            }).join('');
+        }
+
+        function renderMetrics(meta, slices) {
+            const f = meta.global_finops;
+            const life = f.project_total_cost;
+            document.getElementById('lifecycle-total').innerHTML = `${format(life.total)} <span class="text-xs text-slate-600">TOKENS</span>`;
+            document.getElementById('life-p').innerText = format(life.prompt);
+            document.getElementById('life-r').innerText = format(life.reasoning);
+            document.getElementById('life-o').innerText = format(life.output);
+
+            const prodTokens = slices.reduce((acc, s) => acc + (s.token_usage?.total || 0), 0);
+            const efficiency = life.total > 0 ? ((prodTokens / life.total) * 100).toFixed(2) : 0;
+            document.getElementById('efficiency-score').innerText = `${efficiency}%`;
+
+            document.getElementById('bar-life-p').style.width = (life.total > 0 ? (life.prompt / life.total * 100) : 0) + '%';
+            document.getElementById('bar-life-r').style.width = (life.total > 0 ? (life.reasoning / life.total * 100) : 0) + '%';
+            document.getElementById('bar-life-o').style.width = (life.total > 0 ? (life.output / life.total * 100) : 0) + '%';
+
+            renderPhaseFlow(f.phase_stats);
+            drawStaticCharts(meta, slices);
+        }
+
+        function renderTable(slices) {
+            const container = document.getElementById('registry-table-body');
+            if (!container) return;
+            container.innerHTML = slices.map(s => {
+                const u = s.token_usage || { prompt: 0, reasoning: 0, output: 0, total: 0 };
+                return `
+                    <tr class="hover:bg-slate-800/40 transition-all text-[11px]">
+                        <td class="px-6 py-6 font-bold text-white italic uppercase tracking-tighter">${s.id}</td>
+                        <td class="px-6 py-6">
+                            <div class="text-slate-300 font-bold">${s.title}</div>
+                            <div class="text-[9px] text-slate-500 uppercase mt-1 tracking-widest">${s.phase}</div>
+                        </td>
+                        <td class="px-6 py-6">
+                             <div class="flex space-x-6 justify-end">
+                                <div class="flex flex-col items-end"><span class="text-slate-500 uppercase text-[8px] font-bold">Prompt</span><span class="text-white">${format(u.prompt)}</span></div>
+                                <div class="flex flex-col items-end"><span class="text-blue-600 uppercase text-[8px] font-bold">Thinking</span><span class="text-blue-400">${format(u.reasoning)}</span></div>
+                                <div class="flex flex-col items-end"><span class="text-emerald-600 uppercase text-[8px] font-bold">Output</span><span class="text-emerald-400">${format(u.output)}</span></div>
+                            </div>
+                        </td>
+                        <td class="px-6 py-6 text-right">
+                            <div class="text-white font-bold text-base">${format(u.total)}</div>
+                            <div class="text-[8px] text-slate-600 uppercase font-bold tracking-tighter">Tokens Total</div>
+                        </td>
+                    </tr>`;
+            }).join('');
+        }
+
+        async function init() {
+            try {
+                // Carga paralela de ambos archivos
+                const [indexRes, teleRes] = await Promise.all([
+                    fetch('.factory/index.json'),
+                    fetch('.factory/telemetry.json')
+                ]);
+
+                if (!indexRes.ok || !teleRes.ok) throw new Error('Failed to load telemetry or index data');
+
+                const indexData = await indexRes.json();
+                const teleData = await teleRes.json();
+
+                // Usamos index.json para toda la estructura e indicadores
+                renderMetrics(indexData.metadata, indexData.slices);
+                renderTable(indexData.slices);
+
+                // Usamos telemetry.json exclusivamente para la línea de tiempo
+                drawTemporalChart(teleData.logs);
+
+            } catch (e) {
+                console.error("Dashboard Sync Failure:", e);
+                document.getElementById('status-tag').innerText = "Status: Error Loading Data";
+                document.getElementById('status-tag').classList.add('text-red-500');
+            }
+        }
+
+        window.addEventListener('resize', init);
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', init);
+        } else {
+            init();
+        }
+    </script>
 </body>
 </html>
