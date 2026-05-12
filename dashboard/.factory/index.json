@@ -1,0 +1,107 @@
+{
+  "metadata": {
+    "generated_at": "2026-05-08T04:30:00.508164Z",
+    "total_slices": 2,
+    "global_finops": {
+      "total_combined_tokens": 2145665,
+      "project_total_cost": {
+        "prompt": 1675483,
+        "reasoning": 371528,
+        "output": 98654,
+        "total": 2145665
+      },
+      "phase_stats": {
+        "implementation": {
+          "prompt": 279050,
+          "reasoning": 56750,
+          "output": 10700,
+          "total": 346500
+        },
+        "foundations": {
+          "prompt": 1188597,
+          "reasoning": 273110,
+          "output": 79886,
+          "total": 1541593
+        },
+        "planning": {
+          "prompt": 71580,
+          "reasoning": 12776,
+          "output": 2534,
+          "total": 86890
+        },
+        "validation": {
+          "prompt": 15000,
+          "reasoning": 1500,
+          "output": 500,
+          "total": 17000
+        },
+        "specs": {
+          "prompt": 121256,
+          "reasoning": 27392,
+          "output": 5034,
+          "total": 153682
+        }
+      }
+    }
+  },
+  "slices": [
+    {
+      "id": "FRT-001",
+      "title": "FinOps Dashboard",
+      "status": "Approved",
+      "created_at": "2026-05-07T23:59:00Z",
+      "updated_at": "2026-05-08T00:15:00Z",
+      "assigned_to": "gemini-cli",
+      "phase": "validation",
+      "pr_link": "https://github.com/cert-labs-hq/agentic-factory/pull/2",
+      "complexity": "Medium",
+      "forecast": {
+        "complexity": "Medium",
+        "estimated_tokens": {
+          "prompt": 15000,
+          "reasoning": 3000,
+          "output": 1000
+        }
+      },
+      "spec_path": "docs/specs/product/005-initial-dashboaard.md",
+      "dependencies": [
+        "BKP-004"
+      ],
+      "metadata_version": "1.1.0",
+      "token_usage": {
+        "prompt": 35000,
+        "reasoning": 7000,
+        "output": 3400,
+        "total": 45400
+      }
+    },
+    {
+      "id": "BKP-004",
+      "title": "Registry Generator",
+      "status": "In Review",
+      "created_at": "2026-05-06T18:45:00Z",
+      "updated_at": "2026-05-08T03:10:00Z",
+      "assigned_to": "gemini-cli",
+      "phase": "validation",
+      "pr_link": "https://github.com/cert-labs-hq/agentic-factory/pull/3",
+      "complexity": "Medium",
+      "forecast": {
+        "complexity": "Medium",
+        "estimated_tokens": {
+          "prompt": 25000,
+          "reasoning": 5000,
+          "output": 1500
+        }
+      },
+      "spec_path": "docs/specs/product/004-registry-generator.md",
+      "dependencies": [],
+      "metadata_version": "1.0",
+      "token_usage": {
+        "prompt": 373886,
+        "reasoning": 75418,
+        "output": 11868,
+        "total": 461172
+      }
+    }
+  ]
+}

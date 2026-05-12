@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Development Harness | FinOps Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background: #0f172a; color: #f1f5f9; font-family: monospace; }
+        iframe { border: 1px solid #1e293b; border-radius: 8px; width: 100%; height: 600px; background: #000; }
+        pre { background: #1e293b; padding: 1rem; border-radius: 4px; overflow: auto; max-height: 400px; font-size: 10px; }
+        .control-panel { background: #1e293b; padding: 1rem; border-radius: 8px; margin-bottom: 1rem; }
+    </style>
+</head>
+<body class="p-8">
+    <div class="max-w-6xl mx-auto">
+        <header class="mb-8">
+            <h1 class="text-2xl font-bold mb-2">🛠️ Dashboard Development Harness</h1>
+            <p class="text-slate-400 text-sm">Use this tool to inject mock data and verify UI changes without modifying the factory JSON.</p>
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div>
+                <div class="control-panel">
+                    <h2 class="text-lg font-bold mb-4">Mock Controls</h2>
+                    <div class="space-y-4">
+                        <button onclick="updateDashboard()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded font-bold w-full transition-colors">
+                            Push Data to Dashboard
+                        </button>
+                        <button onclick="randomizeData()" class="bg-slate-700 hover:bg-slate-600 text-white px-4 py-2 rounded font-bold w-full transition-colors">
+                            Randomize Tokens
+                        </button>
+                    </div>
+                </div>
+
+                <div class="bg-slate-900 p-4 rounded-lg border border-slate-800">
+                    <h3 class="text-xs font-bold uppercase text-slate-500 mb-2">Payload Preview</h3>
+                    <pre id="payload-preview"></pre>
+                </div>
+            </div>
+
+            <div>
+                <div class="mb-2 flex justify-between items-center">
+                    <span class="text-xs font-bold uppercase text-slate-500 italic tracking-widest">Live Preview (index.html)</span>
+                    <button onclick="reloadIframe()" class="text-xs text-blue-400 hover:underline">Reload Frame</button>
+                </div>
+                <iframe src="index.html" id="dash-frame"></iframe>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let mockData = {
+            metadata: {
+                global_finops: {
+                    project_total_cost: { prompt: 1000000, reasoning: 200000, output: 50000, total: 1250000 },
+                    phase_stats: {
+                        foundations: { prompt: 500000, reasoning: 100000, output: 20000, total: 620000 },
+                        specs: { prompt: 100000, reasoning: 20000, output: 5000, total: 125000 },
+                        planning: { prompt: 50000, reasoning: 10000, output: 2000, total: 62000 },
+                        implementation: { prompt: 300000, reasoning: 60000, output: 20000, total: 380000 },
+                        validation: { prompt: 50000, reasoning: 10000, output: 3000, total: 63000 }
+                    }
+                }
+            },
+            slices: [
+                { id: 'MOCK-001', title: 'Harness Test Slice', phase: 'validation', token_usage: { prompt: 10000, reasoning: 2000, output: 500, total: 12500 } }
+            ]
+        };
+
+        function updateDashboard() {
+            const frame = document.getElementById('dash-frame');
+            frame.contentWindow.postMessage({
+                type: 'UPDATE_DATA',
+                payload: mockData
+            }, '*');
+        }
+
+        function randomizeData() {
+            const r = () => Math.floor(Math.random() * 500000);
+            mockData.metadata.global_finops.project_total_cost.prompt = r();
+            mockData.metadata.global_finops.project_total_cost.reasoning = r();
+            mockData.metadata.global_finops.project_total_cost.output = r();
+            mockData.metadata.global_finops.project_total_cost.total = 
+                mockData.metadata.global_finops.project_total_cost.prompt + 
+                mockData.metadata.global_finops.project_total_cost.reasoning + 
+                mockData.metadata.global_finops.project_total_cost.output;
+            
+            updatePreview();
+            updateDashboard();
+        }
+
+        function updatePreview() {
+            document.getElementById('payload-preview').innerText = JSON.stringify(mockData, null, 2);
+        }
+
+        function reloadIframe() {
+            document.getElementById('dash-frame').src = 'index.html';
+        }
+
+        updatePreview();
+    </script>
+</body>
+</html>
